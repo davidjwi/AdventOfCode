@@ -1,10 +1,10 @@
-#format sample
-#3   4
-#4   3
-#2   5
-#1   3
-#3   9
-#3   3
+# format sample
+# 3   4
+# 4   3
+# 2   5
+# 1   3
+# 3   9
+# 3   3
 
 
 list_1 = []
@@ -21,10 +21,22 @@ with open("day1_input.txt", "r") as input_file:
 list_1.sort()
 list_2.sort()
 
-for x,y in zip(list_1, list_2):
+for x, y in zip(list_1, list_2):
     dist = abs(x - y)
     list_3.append(dist)
 
 total_dist = sum(list_3)
 
 print(total_dist)
+
+summed_list = list_1.copy()
+counts = {}
+
+for x in list_1:
+    if x not in counts:
+        counts[x] = list_2.count(x)
+
+for i, x in enumerate(summed_list):
+    summed_list[i] = x * counts[x]
+
+print(sum(summed_list))
