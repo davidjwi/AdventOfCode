@@ -10,6 +10,7 @@ def main():
     WORD_LEN = len(WORD_MATCH)
     WORD_MATCH_count = 0
     word_search = {}
+    x_count = 0
 
     filepath = 'day4_input.txt'
     with open(filepath, 'r') as file:
@@ -34,6 +35,9 @@ def main():
         # assume all rows in the word search are the same length
         (x, y) = curr_point
 
+        x_match = get_x_pattern(curr_point, word_search)
+        x_count += x_match
+
         position_match_count = get_position_matches(
             curr_point,
             word_search,
@@ -43,7 +47,8 @@ def main():
 
         WORD_MATCH_count += position_match_count
 
-    print(WORD_MATCH_count)
+    print('Part 2 answer: {}'.format(x_count))
+    print('Part 1 answer: {}'.format(WORD_MATCH_count))
 
 
 def get_position_matches(curr_position, word_search_dict, WORD_MATCH, WORD_LEN, WORD_SEARCH_ROW_LENGTH):
@@ -120,5 +125,37 @@ def get_position_matches(curr_position, word_search_dict, WORD_MATCH, WORD_LEN, 
 
     return count_of_position_matches
 
+def get_x_pattern(curr_position, word_search_dict):
+    # curr_pos = x,y
+    x = curr_position[0]
+    y = curr_position[1]
+    count_of_matches = 0
+
+#    first_slash = [(x-1, y-1), (x, y), (x+1, y+1)]
+    a1 = (x-1, y-1)
+    a2 = (x, y)
+    a3 = (x+1, y+1)
+#    second_slash = [(x-1, y+1), (x, y), (x+1, y-1)]
+    b1 = (x-1, y+1)
+    b2 = (x, y)
+    b3 = (x+1, y-1)
+    try:
+        first_slash = word_search_dict[a1[0], a1[1]] + word_search_dict[a2[0], a2[1]] + word_search_dict[a3[0], a3[1]]
+        second_slash = word_search_dict[b1[0], b1[1]] + word_search_dict[b2[0], b2[1]] + word_search_dict[b3[0], b3[1]]
+        print('{} x {}'.format(first_slash, second_slash))
+        if (first_slash == 'MAS' or first_slash == 'SAM') and (second_slash == 'MAS' or second_slash == 'SAM'):
+            count_of_matches += 1
+    except KeyError:
+        print('There was a key error')
+
+    return count_of_matches
+
 
 main()
+
+
+
+
+
+
+
