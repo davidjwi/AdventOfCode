@@ -1,4 +1,7 @@
-
+# 40|78
+# 11|90
+#
+# 40,78,90,10
 
 filepath = 'day5_input.txt'
 with open(filepath, 'r') as file:
@@ -8,73 +11,77 @@ with open(filepath, 'r') as file:
 for i, x in enumerate(input_data):
     if x == '':
         rule_strings = input_data[:i]
-        updates = [x for x in input_data[i:] if x != '']
+        updates = [list(map(int, x.split(',')))
+                   for x in input_data[i:] if x != '']
         break
 
-# print(updates)
+RULES = [
+    tuple(map(int, x.split('|'))) for x in rule_strings
+]
 
-rules = [list(map(int, x.split('|'))) for x in rule_strings]
-
-updates_to_check = []
+UPDATES_TO_CHECK = []
 
 for update_row in updates:
     updates_dict = {}
-    int_row = list(map(int, update_row.split(',')))
-    for i, number in enumerate(int_row):
-        updates_dict[number] = i
-    updates_to_check.append(updates_dict)
+    for order_value, number_as_key in enumerate(update_row):
+        updates_dict[number_as_key] = order_value
+    UPDATES_TO_CHECK.append(updates_dict)
 
-# print(updates_to_check)
-#
-# print(rules)
-
-good_updates = []
+bad_updates = []
 
 
-def check_update(update, rules):
-    for rule in rules:
+def check_update(update, RULES):
+    for rule in RULES:
         x = rule[0]
         y = rule[1]
         order_of_x = False
         order_of_y = False
-        bad_rule_count = 0
         try:
             order_of_x = update[x]
-#            print('x: {} has order: {}'.format(x, order_of_x))
-        except KeyError:
-            #            print('Key error for x: {}'.format(x))
-            pass
-        try:
             order_of_y = update[y]
-#            print('y: {} has order: {}'.format(y, order_of_y))
-        except KeyError:
-            #            print('Key error for y: {}'.format(y))
-            pass
-        if order_of_x is not False and order_of_y is not False:
-            # print('Comparing x {} and y {} the orders are {} and {}'.format(x, y, order_of_x, order_of_y))
-            if order_of_x < order_of_y:
-                print('this rule is good {}'.format(rule))
-            else:
-                print('the rule is bad... {}'.format(rule))
-                bad_rule_count = 1
+            if order_of_x > order_of_y:
+                bad_updates.append(update)
                 break
+        except KeyError:
+            pass
+
+
+def fix_update(update, RULES):
+    for rule in RULES:
+        bad_rule_count = 0
+        x = rule[0]
+        y = rule[1]
+        order_of_x = False
+        order_of_y = False
+        try:
+            order_of_x = update[x]
+            order_of_y = update[y]
+            if order_of_x > order_of_y:
+                #                print('The rule is bad... {}\nFor update... {}'.format(rule, update))
+                update[x] = order_of_y
+                update[y] = order_of_x
+                bad_rule_count += 1
+        except KeyError:
+            pass
+        if bad_rule_count > 0:
+            fix_update(update, RULES)
 
     if bad_rule_count == 0:
-        good_updates.append(update)
+        return update
 
 
-for update in updates_to_check:
-    #    print(update)
-    check_update(update, rules)
+for update in UPDATES_TO_CHECK:
+    check_update(update, RULES)
+# print('Bad Updates: {}'.format(bad_updates))
 
-# print(good_updates)
+for update in bad_updates:
+    fix_update(update, RULES)
+# print('Fixed Updates: {}'.format(bad_updates))
 total = 0
-for update in good_updates:
+for update in bad_updates:
     dict_len = len(update)
     middle_number = int((dict_len-1)/2)
     number_to_sum = [key for key,
                      value in update.items() if value == middle_number]
-#    print(number_to_sum[0])
     total += number_to_sum[0]
-
 print('Answer: {}'.format(total))
