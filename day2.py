@@ -4,42 +4,43 @@
 # 1 3 2 4 5
 # 8 6 4 4 1
 # 1 3 6 7 9
+def check_difference(report):
+    for (num, next_num) in zip(report, report[1:]):
+        difference = abs(num - next_num)
+        if difference < 1 or difference > 3:
+            return False
+    return True
 
 
-lines = []
+def check_sorted(report):
+    if (report == sorted(report) or report == sorted(report, reverse=True)):
+        return True
+    else:
+        return False
+
+
 with open("day2_input.txt", 'r') as input_file:
+    reports = []
     for line in input_file:
-        lines.append(line.strip().split(" "))
-
-print(lines)
+        line = line.strip().split(" ")
+        line = list(map(int, line))
+        reports.append(line)
 
 safe_reports = []
+not_safe_reports = []
 
-for report in lines:
-    report = list(map(int, report))
-    print(report)
-    if (report == sorted(report) or report == sorted(report, reverse=True)):
-        isSafe = True
-        for i, x in enumerate(report):
-            try:
-                a = abs(x - report[i+1])
-                print(a)
-                if not (a >= 1 and a <= 3):
-                    print('Adjacent level NOT between 1 and 3: {}'.format(a))
-                    safe_reports.append(False)
-                    print('breaking')
-                    isSafe = False
-                    break
-                print('here1')
-            except:
-                IndexError
-            print('here2')
-        print('here3')
-        if isSafe:
-            safe_reports.append(True)
-    print('Done')
-    print(safe_reports)
+for report in reports:
+    if check_difference(report) and check_sorted(report):
+        safe_reports.append(report)
+    else:
+        not_safe_reports.append(report)
 
+for report in not_safe_reports:
+    for index, num in enumerate(report):
+        test_report = report.copy()
+        test_report.pop(index)
+        if (check_difference(test_report) and check_sorted(test_report)):
+            safe_reports.append(report)
+            break
 
-print(safe_reports)
-print(safe_reports.count(True))
+print(len(safe_reports))
