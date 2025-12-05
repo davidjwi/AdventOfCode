@@ -1,42 +1,48 @@
 def main():
     answer = 0 
-    with open('input', 'r') as file:
-        lines = file.readlines()
+    ranges_to_check = set() 
 
-    lines = [line.strip() for line in lines]
-    lines = [line.split(',') for line in lines]
+    with open('input', 'r') as input_file:
+        for line in input_file.readlines():
+            for id_range in line.strip().split(','):
+                if id_range != '':
+                    ids_start_stop = id_range.split('-')
+                    start, stop = int(ids_start_stop[0]), int(ids_start_stop[1])
+                    ranges_to_check.add((start, stop))
 
-    for line in lines:
-        for num_range in line:
-            if num_range != '':
-                idx = num_range.find('-')
-                num1 = num_range[:idx]
-                num2 = num_range[idx+1:]
-                for num in range(int(num1),int(num2)+1):
-                    str_num = str(num)
-                    if str_num in cache:
-                        is_sequence = cache[str_num]
-                    else:
-                        is_sequence = check_sequence(str_num)
-                    if is_sequence:
-                        answer += int(num)
+    for id_range in ranges_to_check:
+        id_range_start = id_range[0]
+        id_range_stop = id_range[1] 
+
+        for product_id in range(id_range_start, id_range_stop+1):
+            product_id_str = str(product_id)
+            test_case_sequences = create_sequences_to_test(product_id_str)
+
+            for test_case in test_case_sequences:
+                # use split to remove any matching sequences from the product_id
+                test_output = product_id_str.split(test_case)
+                output_validity = True
+                for item in test_output:
+                    if item != '':
+                        # a good sequence won't have any values besides ''
+                        output_validity = False
+                        break
+                if output_validity is True:
+                    answer = answer + product_id 
+                    # break otherwise it will add product_id like '2222' twice
+                    # because '2' and '22' are valid sequences for that product_id
+                    break
     return answer
 
-cache = {}
-def check_sequence(num: str):
-    if num in cache:
-        return cache[num]
-    midIdx  = len(num)//2
-    num1 = num[:midIdx]
-    num2 = num[midIdx:] 
-    if num1 == num2:
-        cache[num] = True
-        return True
-    else:
-        cache[num] = False
-        return False
 
-        
+def create_sequences_to_test(curr_id: str):
+    midIdx = len(curr_id)//2
+    testSequences = []
+    for i in range(1, midIdx+1):
+        newSequenceToTest = curr_id[:i]
+        testSequences.append(newSequenceToTest)
+    return testSequences
+
 
 if __name__ == '__main__':
     print(main())
