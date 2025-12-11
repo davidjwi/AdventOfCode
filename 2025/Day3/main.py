@@ -1,47 +1,47 @@
 def main():
+    SEQUENCE_LENGTH = 12
     answer = 0
     battery_banks = []
     with open('input', 'r') as input_file:
         for line in input_file.readlines():
             battery_banks.append(line.strip())
 
+ 
     for battery_bank in battery_banks:
-        firstBattery = find_highest_battery(battery_bank, True)
-        firstBatteryIdx = firstBattery[1]
-        
-        remaining_battery_bank = battery_bank[firstBatteryIdx+1:]
-        secondBattery = find_highest_battery(remaining_battery_bank, False)
-        
-        highest_pair_str = str(firstBattery[0]) + str(secondBattery[0])
+        battery_sequence_output = generate_sequence_from_start_battery('', battery_bank, 12)
+        battery_output_int = int(battery_sequence_output)
+        answer += battery_output_int
 
-        answer += int(highest_pair_str)
-        
-    print (answer)
+    print(f'Answer is {answer}')
     return answer
 
-def find_highest_battery(battery_bank: str, is_first_battery: bool):
-    highest_battery = None
-    highest_battery_idx = None
-    battery_bank_len = len(battery_bank)
+ 
+def generate_sequence_from_start_battery(battery_sequence: str, battery_bank: str, SEQUENCE_LENGTH: int) -> str:
+    
+    battery_sequence_length = len(battery_sequence)
+    battery_bank_length = len(battery_bank)
+    
 
-    if is_first_battery:
-        battery_bank_len = battery_bank_len - 1
+    if battery_bank_length == 0 or battery_sequence_length > 11:
+        return battery_sequence
 
-    for i in range(0, battery_bank_len):
-        battery_int = int(battery_bank[i])
+    high_battery_int = 0
+    battery_idx = -1
 
-        if highest_battery is None:
-            highest_battery = battery_int
-            highest_battery_idx = i
-        elif highest_battery < battery_int:
-            highest_battery = battery_int
-            highest_battery_idx = i
+    end_point = battery_bank_length - (SEQUENCE_LENGTH - battery_sequence_length)
 
-        if highest_battery == 9:
-            break
+    for idx in range(0, end_point+1):
+        battery_int = int(battery_bank[idx])
 
-    return [highest_battery, highest_battery_idx]
+        if high_battery_int < battery_int:
+            high_battery_int = battery_int
+            battery_idx = idx
 
+    battery_sequence += str(high_battery_int)
+    new_battery_bank_list = battery_bank[battery_idx+1:]
 
+    return generate_sequence_from_start_battery(battery_sequence, new_battery_bank_list, SEQUENCE_LENGTH)
+
+ 
 if __name__ == '__main__':
     main()
