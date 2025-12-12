@@ -6,31 +6,23 @@ def main():
             grid_of_paper_rolls.append([x for x in line.strip()])
 
 
-
-    col_length = len(grid_of_paper_rolls)
-    row_length = len(grid_of_paper_rolls[0])
-
-    curr_idx = (0, 0)
+    num_rows = len(grid_of_paper_rolls)
+    num_cols = len(grid_of_paper_rolls[0])
 
     answer = 0
-    loop_starting_answer = answer
-    loop_end_answer = -1
+    has_changed = True
 
-    checked = set()
-    while loop_starting_answer != loop_end_answer:
-        loop_starting_answer = answer
-        for row in range(0, row_length):
-            for col in range(0, col_length):
+    while has_changed != False:
+        has_changed = False
+        for row in range(0, num_rows):
+            for col in range(0, num_cols):
                 curr_idx = (row, col)
-                if curr_idx not in checked: 
-                    if grid_of_paper_rolls[row][col] == '@':
-                        total_neighbors = count_neighbor_rolls(curr_idx, grid_of_paper_rolls, col_length, row_length)
-                        if total_neighbors < 4:
-                            answer += 1
-                            grid_of_paper_rolls[row][col] = '.'
-                            checked.add((row, col))
-                            break
-        loop_end_answer = answer
+                if grid_of_paper_rolls[row][col] == '@':
+                    total_neighbors = count_neighbor_rolls(curr_idx, grid_of_paper_rolls, num_rows, num_cols)
+                    if total_neighbors < 4:
+                        answer += 1
+                        grid_of_paper_rolls[row][col] = '.'
+                        has_changed = True
 
 
     print(answer)
@@ -57,9 +49,8 @@ def count_neighbor_rolls(roll_idx: tuple, grid_of_paper_rolls: list, col_length,
         row_offset, col_offset = DIRECTIONS[direction]
         new_row = row_offset + curr_row
         new_col = col_offset + curr_col
-        if new_col >= 0 and new_col < col_length and new_row >= 0 and new_row < row_length:
-            neighbor = grid_of_paper_rolls[new_row][new_col]
-            if neighbor == '@':
+        if 0 <= new_col < col_length and 0 <= new_row < row_length:
+            if grid_of_paper_rolls[new_row][new_col] == '@':
                 local_neighbors_count += 1
         if local_neighbors_count > 3:
             break
